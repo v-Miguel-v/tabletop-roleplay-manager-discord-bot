@@ -10,7 +10,7 @@ module.exports = {
 		),
 
 	async execute(interaction) {
-		const user = interaction.user;
+		const user = interaction.options.getUser("usuario") || interaction.user;
 		const embed = {
 			description: `Avatar de ${user.displayName}`,
 			image: {url: user.displayAvatarURL({ dynamic: true, size: 1024 })}
