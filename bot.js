@@ -5,7 +5,7 @@ const TOKEN = process.env.TOKEN;
 const CLIENT_ID = process.env.CLIENT_ID;
 const INTENTS = Number(process.env.INTENTS);
 
-const { REST, Routes, Client } = require("discord.js");
+const { REST, Routes, Client, ApplicationCommandOptionType } = require("discord.js");
 const client = new Client({ intents: INTENTS });
 const rest = new REST({ version: '10' }).setToken(TOKEN);
 
@@ -13,11 +13,27 @@ const rest = new REST({ version: '10' }).setToken(TOKEN);
 client.on("ready", () => { console.log("El cliente está listo para su ejecución.\n"); });
 
 // Slash Commands Update
+/*
 const slashCommands = [];
 fs.readdirSync("./slash_commands").forEach(file => {
 	const command = require(`./slash_commands/${file}`);
 	slashCommands.push(command.data.toJSON());
 });
+*/
+const slashCommands = [
+	{
+		name: "eco",
+		description: "Repite el input ingresado.",
+		options: [
+			{
+				name: "input",
+				description: "Input a repetir.",
+				type: ApplicationCommandOptionType.String,
+				required: true
+			}
+		]
+	}
+];
 
 (async () => {
 	try {
@@ -38,10 +54,15 @@ async function detectSlashCommand(interaction) {
 	if (!interaction.isChatInputCommand()) return;
 
 	try {
+		const x = (interaction.options.get("input").value);
+		interaction.reply(x);
+		/*
 		const commandName = interaction;
-		console.log(`/) ${interaction.user.displayName} usó el comando "${interaction}"`);
+		console.log(`(/) ${interaction.user.displayName} usó el comando "${interaction}"`);
 		const command = require(`./slash_commands/${commandName}.scmd.js`);
+		console.log(command.options);
 		await command.execute(interaction);
+		*/
 	} catch (error) {
 		console.group("(/) SLASH COMMAND ERROR HANDLER (/)");
 			console.error(`ERROR: Ocurrió un error al momento de ejecutar el comando "${interaction}".`);
@@ -72,7 +93,7 @@ async function detectTextCommand(message) {
 	if (!textCommands.includes(commandName)) return;
 
 	try {
-		console.log(`!) ${message.author.displayName} usó el comando "!${commandName}"`);
+		console.log(`(!) ${message.author.displayName} usó el comando "!${commandName}"`);
 		const commandToExecute = require(`./text_commands/${commandName}.tcmd.js`);
 		await commandToExecute(message);
 	} catch (error) {
