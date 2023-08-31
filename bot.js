@@ -1,4 +1,5 @@
 // Requeriments and Initializations
+const fs = require("node:fs");
 require("dotenv").config();
 const TOKEN = process.env.TOKEN;
 const CLIENT_ID = process.env.CLIENT_ID;
@@ -9,12 +10,10 @@ const client = new Client({ intents: INTENTS });
 const rest = new REST({ version: '10' }).setToken(TOKEN);
 
 // When Client is Ready...
-client.on("ready", () => { console.log("El Cliente está listo para su ejecución"); });
+client.on("ready", () => { console.log("El cliente está listo para su ejecución.\n"); });
 
 // Slash Commands Update
-const fs = require("node:fs");
 const slashCommands = [];
-
 fs.readdirSync("./slash_commands").forEach(file => {
 	const command = require(`./slash_commands/${file}`);
 	slashCommands.push(command.data.toJSON());
@@ -23,8 +22,10 @@ fs.readdirSync("./slash_commands").forEach(file => {
 (async () => {
 	try {
 		await rest.put(Routes.applicationCommands(CLIENT_ID), { body: slashCommands });
-		console.log(slashCommands);
-		console.log("La aplicación fue actualizada y recargada correctamente con los comandos slash.");
+		console.group(`(/) Comandos SLASH Cargados (/): ${slashCommands.length}`);
+			slashCommands.map(command => command.name).forEach(command => console.log(`✅) ${command}`));
+		console.groupEnd(`(/) Comandos SLASH Cargados (/): ${slashCommands.length}`);
+		console.log("");
 	} catch (error) {
 		console.error("Ocurrió un error en la actualización y recarga de los comandos slash.");
 		console.error(error);
@@ -38,36 +39,49 @@ async function detectSlashCommand(interaction) {
 
 	try {
 		const commandName = interaction;
-		console.log(`Se ha usado el comando ${interaction}`);
+		console.log(`/) ${interaction.user.displayName} usó el comando "${interaction}"`);
 		const command = require(`./slash_commands/${commandName}.scmd.js`);
-		console.log(interaction.options._hoistedOptions);
-		command.execute(interaction);
+		await command.execute(interaction);
 	} catch (error) {
-		console.error(`
-			Ocurrió un error al intentar ejecutar un comando slash.
-			Error:
-			${error}
-		`);
+		console.group("(/) SLASH COMMAND ERROR HANDLER (/)");
+			console.error(`ERROR: Ocurrió un error al momento de ejecutar el comando "${interaction}".`);
+			console.error(`${interaction.user.displayName} fue quién ejecutó el comando.`);
+			console.error("Y eso ocasionó el siguiente error:");
+			console.error(error);
+		console.groupEnd("(/) SLASH COMMAND ERROR HANDLER (/)");
 	}
 }
+
+// Text Command Update
+const textCommands = [];
+fs.readdirSync("./text_commands").forEach(file => {
+	const command = file.split(".tcmd.js")[0];
+	textCommands.push(command);
+});
+console.group(`(!) Comandos de TEXTO Cargados (!): ${textCommands.length}`);
+	textCommands.forEach(command => console.log(`✅) ${command}`));
+console.groupEnd(`(!) Comandos de TEXTO Cargados (!): ${textCommands.length}`)
+console.log("");
 
 // Text Command Handler
 client.on("messageCreate", detectTextCommand);
 async function detectTextCommand(message) {
 	if(message.author.bot) return;
 	if(!message.content.startsWith("!")) return;
+	const commandName = message.content.toLowerCase().slice(1).split(" ")[0];
+	if (!textCommands.includes(commandName)) return;
 
 	try {
-		const commandName = message.content.toLowerCase().slice(1).split(" ")[0];
-		console.log(`${message.author.displayName} usó el comando "${commandName}"`);
+		console.log(`!) ${message.author.displayName} usó el comando "!${commandName}"`);
 		const commandToExecute = require(`./text_commands/${commandName}.tcmd.js`);
-		commandToExecute(message);
+		await commandToExecute(message);
 	} catch (error) {
-		console.error(`
-			${message.author} redactó el siguiente mensaje: "${message}".
-			Y eso ocasionó el siguiente error:
-			${error}
-		`);
+		console.group("(!) TEXT COMMAND ERROR HANDLER (!)");
+			console.error(`ERROR: Ocurrió un error al momento de ejecutar el comando "!${commandName}".`);
+			console.error(`${message.author} redactó el siguiente mensaje: "${message}".`);
+			console.error("Y eso ocasionó el siguiente error:");
+			console.error(error);
+		console.groupEnd("TEXT COMMAND ERROR HANDLER");
 	}
 }
 

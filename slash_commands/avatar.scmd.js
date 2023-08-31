@@ -1,13 +1,20 @@
 const { SlashCommandBuilder } = require("discord.js");
 
-const avatarCommand = {
+module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("avatar")
-		.setDescription("Muestra la imagen de tu avatar (o la del usuario mencionado)."),
+		.setDescription("Muestra la imagen de tu avatar (o la del usuario mencionado).")
+		.addUserOption(option => option
+			.setName("usuario")
+			.setDescription("Usuario del que se mostrará el avatar.")
+		),
 
-	execute(interaction) {
-		interaction.reply("Funcionando.");
+	async execute(interaction) {
+		const user = interaction.user;
+		const embed = {
+			description: `Avatar de ${user.displayName}`,
+			image: {url: user.displayAvatarURL({ dynamic: true, size: 1024 })}
+		};
+		await interaction.reply({embeds: [embed]});
 	}
 }
-
-module.exports = avatarCommand;
