@@ -1,0 +1,4 @@
+```diff
++ Usos Restantes de Rasgos, Objetos y Conjuros:
+...
+```

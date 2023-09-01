@@ -1,0 +1,10 @@
+```diff
++ Inventario:
+Dinero:
+
+--- Transportado y Equipado ---
+...
+
+--- Almacenado ---
+...
+```
