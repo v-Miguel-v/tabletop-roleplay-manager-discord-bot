@@ -19,7 +19,7 @@ module.exports = {
 	async execute(interaction) {
 		const user = interaction.options.getUser("dueño") || interaction.user;
 		const channel = interaction.options.getChannel("canal");
-		const route = "./extras/character_sheet_formats/lewdity_quest_campaing";
+		const route = "./extras/character_sheet_formats/lewdity_quest_campaign";
 
 		channel.send(`**📝 __FICHA DE PERSONAJE DE ${user}__ 📝**`);
 		fs.readdirSync(route).forEach(file => {

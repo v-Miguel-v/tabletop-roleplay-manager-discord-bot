@@ -32,23 +32,40 @@ fs.readdirSync("./slash_commands").forEach(file => {
 	}
 })();
 
-// Slash Command Handler
+// Interactions Handler (Slash Commands, Menus and Buttons)
 client.on("interactionCreate", detectSlashCommand);
 async function detectSlashCommand(interaction) {
-	if (!interaction.isChatInputCommand()) return;
+	if (interaction.isChatInputCommand()) {
+		try {
+			const commandName = interaction.commandName;
+			console.log(`(/) ${interaction.user.displayName} usó el comando "${interaction}"`);
+			const command = require(`./slash_commands/${commandName}.scmd.js`);
+			await command.execute(interaction);
+		} catch (error) {
+			console.group("(/) SLASH COMMAND ERROR HANDLER (/)");
+				console.error(`ERROR: Ocurrió un error al momento de ejecutar el comando "${interaction}".`);
+				console.error(`${interaction.user.displayName} fue quién ejecutó el comando.`);
+				console.error("Y eso ocasionó el siguiente error:");
+				console.error(error);
+			console.groupEnd("(/) SLASH COMMAND ERROR HANDLER (/)");
+		}
+	}
 
-	try {
-		const commandName = interaction.commandName;
-		console.log(`(/) ${interaction.user.displayName} usó el comando "${interaction}"`);
-		const command = require(`./slash_commands/${commandName}.scmd.js`);
-		await command.execute(interaction);
-	} catch (error) {
-		console.group("(/) SLASH COMMAND ERROR HANDLER (/)");
-			console.error(`ERROR: Ocurrió un error al momento de ejecutar el comando "${interaction}".`);
-			console.error(`${interaction.user.displayName} fue quién ejecutó el comando.`);
-			console.error("Y eso ocasionó el siguiente error:");
-			console.error(error);
-		console.groupEnd("(/) SLASH COMMAND ERROR HANDLER (/)");
+	if (interaction.isAnySelectMenu()) {
+		try {
+			const menuName = interaction.customId;
+			console.log(interaction);
+			console.log(`(📝) ${interaction.user.displayName} seleccionó la opción "${interaction.values[0]}" del menú "${menuName}"`);
+			const menuToExecute = require(`./select_menus/${menuName}.menu.js`);
+			await menuToExecute(interaction);
+		} catch (error) {
+			console.group("(📝) SELECT MENU INTERACTION ERROR HANDLER (📝)");
+				console.error(`ERROR: Ocurrió un error al momento de ejecutar la opción "${interaction}" en un menu.`);
+				console.error(`${interaction.user.displayName} fue quién seleccionó la opción.`);
+				console.error("Y eso ocasionó el siguiente error:");
+				console.error(error);
+			console.groupEnd("(📝) SELECT MENU INTERACTION ERROR HANDLER (📝)");
+		}
 	}
 }
 
