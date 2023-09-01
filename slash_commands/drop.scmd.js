@@ -15,8 +15,6 @@ module.exports = {
 				.addOptions(
 					new StringSelectMenuOptionBuilder()
 						.setLabel("Opción 1")
-						.setDescription("Esta es la opción 1")
-						.setEmoji("✨")
 						.setValue("1"),
 
 					new StringSelectMenuOptionBuilder()
@@ -35,7 +33,8 @@ module.exports = {
 
 		await interaction.reply({
 			content: "Funcionando (slash).",
-			components: [menu]
+			components: [menu],
+			ephemeral: true
 		});
 	}
 }

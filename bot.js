@@ -32,10 +32,10 @@ fs.readdirSync("./slash_commands").forEach(file => {
 	}
 })();
 
-// Interactions Handler (Slash Commands, Menus and Buttons)
-client.on("interactionCreate", detectSlashCommand);
-async function detectSlashCommand(interaction) {
-	if (interaction.isChatInputCommand()) {
+// Interactions Handler (Slash Commands, Select Menus and Buttons)
+client.on("interactionCreate", handleInteraction);
+async function handleInteraction(interaction) {
+	if (interaction.isChatInputCommand()) { // Slash Command Handler
 		try {
 			const commandName = interaction.commandName;
 			console.log(`(/) ${interaction.user.displayName} usó el comando "${interaction}"`);
@@ -51,10 +51,9 @@ async function detectSlashCommand(interaction) {
 		}
 	}
 
-	if (interaction.isAnySelectMenu()) {
+	if (interaction.isAnySelectMenu()) { // Select Menu Handler
 		try {
 			const menuName = interaction.customId;
-			console.log(interaction);
 			console.log(`(📝) ${interaction.user.displayName} seleccionó la opción "${interaction.values[0]}" del menú "${menuName}"`);
 			const menuToExecute = require(`./select_menus/${menuName}.menu.js`);
 			await menuToExecute(interaction);
@@ -81,8 +80,8 @@ console.groupEnd(`(!) Comandos de TEXTO Cargados (!): ${textCommands.length}`)
 console.log("");
 
 // Text Command Handler
-client.on("messageCreate", detectTextCommand);
-async function detectTextCommand(message) {
+client.on("messageCreate", handleTextCommand);
+async function handleTextCommand(message) {
 	if(message.author.bot) return;
 	if(!message.content.startsWith("!")) return;
 	const commandName = message.content.toLowerCase().slice(1).split(" ")[0];
