@@ -39,7 +39,7 @@ async function handleInteraction(interaction) {
 		try {
 			const commandName = interaction.commandName;
 			console.log(`(/) ${interaction.user.displayName} usó el comando "${interaction}"`);
-			const command = require(`./slash_commands/${commandName}.scmd.js`);
+			const command = require(`./slash_commands/${commandName}.slash.js`);
 			await command.execute(interaction);
 		} catch (error) {
 			console.group("(/) SLASH COMMAND ERROR HANDLER (/)");
@@ -71,7 +71,7 @@ async function handleInteraction(interaction) {
 // Text Command Update
 const textCommands = [];
 fs.readdirSync("./text_commands").forEach(file => {
-	const command = file.split(".tcmd.js")[0];
+	const command = file.split(".text.js")[0];
 	textCommands.push(command);
 });
 console.group(`(!) Comandos de TEXTO Cargados (!): ${textCommands.length}`);
@@ -89,7 +89,7 @@ async function handleTextCommand(message) {
 
 	try {
 		console.log(`(!) ${message.author.displayName} usó el comando "!${commandName}"`);
-		const commandToExecute = require(`./text_commands/${commandName}.tcmd.js`);
+		const commandToExecute = require(`./text_commands/${commandName}.text.js`);
 		await commandToExecute(message);
 	} catch (error) {
 		console.group("(!) TEXT COMMAND ERROR HANDLER (!)");

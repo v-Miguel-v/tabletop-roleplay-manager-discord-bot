@@ -32,9 +32,9 @@ module.exports = {
 		const user = interaction.options.getUser("dueño") || interaction.user;
 		const route = `./extras/character_sheet_types/${typeRoute}`;
 		const files = fs.readdirSync(route);
-		const typeSelectedIsAvailable = files.some(file => file.endsWith(".txt")) && files.some(file => file.endsWith(".json"));
+		const selectedTypeIsAvailable = files.some(file => file.endsWith(".txt")) && files.some(file => file.endsWith(".json"));
 
-		if (!typeSelectedIsAvailable) {
+		if (!selectedTypeIsAvailable) {
 			await interaction.reply(`*La creación de fichas de **${type}** aún no está disponible.*`);
 		} else {
 			channel.send(`**📝 __FICHA DE PERSONAJE DE ${user}__ 📝**`);
