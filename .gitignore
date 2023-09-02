@@ -213,7 +213,7 @@ $RECYCLE.BIN/
 *.lnk
 
 # Extras
-extras/character_sheet_formats/lewdity_quest_campaign
+extras/character_sheet_types/lewdity_quest_campaign
 extras/character_sheets_saved
 
 # End of https://www.toptal.com/developers/gitignore/api/windows,node,macos,linux
