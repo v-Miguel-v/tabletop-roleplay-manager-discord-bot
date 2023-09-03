@@ -1,2 +1,2 @@
-# dnd5e-discord-bot
-Un bot de discord para jugar DnD5e.
+# Tabletop Roleplay Manager (Discord Bot)
+Un bot de discord para jugar y gestionar partidas de rol de mesa.

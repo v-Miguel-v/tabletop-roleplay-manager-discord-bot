@@ -1,11 +1,11 @@
 {
-  "name": "dnd5e-discord-bot",
+  "name": "tabletop-roleplay-manager-discord-bot",
   "version": "1.0.0",
-  "description": "Un bot de discord para jugar DnD5e.",
+  "description": "Un bot de discord para jugar y gestionar partidas de rol de mesa.",
   "main": "bot.js",
   "scripts": {
     "test": "node .",
-    "dev": "nodemon ."
+    "dev": "nodemon . --ignore ./extras/character_sheets_saved"
   },
   "keywords": [
     "dnd5e",

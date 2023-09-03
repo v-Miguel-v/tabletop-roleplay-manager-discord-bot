@@ -1,9 +1,11 @@
 const fs = require("node:fs");
+const { SlashCommandBuilder, ChannelType } = require("discord.js");
+const createEmptyCharacterSheet = require("../extras/tools/createEmptyCharacterSheet");
+
 const types = [];
 const typeNames = fs.readdirSync("./extras/character_sheet_types").map(x => x.replace(/_/g, " "));
 typeNames.forEach(typeName => { types.push({ name: typeName, value: typeName }) });
 
-const { SlashCommandBuilder, ActionRowBuilder, ChannelSelectMenuBuilder, ChannelType, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } = require("discord.js");
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("crear-ficha")
@@ -29,7 +31,7 @@ module.exports = {
 		const channel = interaction.options.getChannel("canal");
 		const type = interaction.options.getString("tipo-de-ficha");
 		const typeRoute = type.replace(/\s/g, "_");
-		const user = interaction.options.getUser("dueño") || interaction.user;
+		const owner = interaction.options.getUser("dueño") || interaction.user;
 		const route = `./extras/character_sheet_types/${typeRoute}`;
 		const files = fs.readdirSync(route);
 		const selectedTypeIsAvailable = files.some(file => file.endsWith(".txt")) && files.some(file => file.endsWith(".json"));
@@ -37,15 +39,17 @@ module.exports = {
 		if (!selectedTypeIsAvailable) {
 			await interaction.reply(`*La creación de fichas de **${type}** aún no está disponible.*`);
 		} else {
-			channel.send(`**📝 __FICHA DE PERSONAJE DE ${user}__ 📝**`);
+			const messageIds = [];
+			channel.send(`**📝 __FICHA DE PERSONAJE DE ${owner}__ 📝**`);
 			fs.readdirSync(route).forEach(file => {
 				if (file.endsWith(".txt")) {
-					const message = fs.readFileSync(`${route}/${file}`).toString("utf-8");
-					channel.send(message);
+					const text = fs.readFileSync(`${route}/${file}`).toString("utf-8");
+					const messageSent = channel.send(text);
+					messageIds.push(messageSent.id);
 				}
 			});
-			// Crear ficha en almacenamiento.
-			await interaction.reply(`*Se ha creado una nueva ficha de personaje (vacía) de **${type}** para **${user.displayName}** en el canal ${channel}.*`);
+			createEmptyCharacterSheet(owner, type);
+			await interaction.reply(`*Se ha creado una nueva ficha de personaje (vacía) de **${type}** para **${owner.displayName}** en el canal ${channel}.*`);
 		}
 	}
 }
