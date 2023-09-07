@@ -27,7 +27,7 @@ module.exports = {
 			.setDescription("El dueño de la ficha.")
 		),
 
-	async execute(interaction) {
+	async execute(interaction, client) {
 		const channel = interaction.options.getChannel("canal");
 		const type = interaction.options.getString("tipo-de-ficha");
 		const typeRoute = type.replace(/\s/g, "_");

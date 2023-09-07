@@ -15,8 +15,10 @@ client.on("ready", () => { console.log("El cliente está listo para su ejecució
 // Slash Commands Update
 const slashCommands = [];
 fs.readdirSync("./slash_commands").forEach(file => {
-	const command = require(`./slash_commands/${file}`);
-	slashCommands.push(command.data.toJSON());
+	if (file.endsWith(".slash.js")) {
+		const command = require(`./slash_commands/${file}`);
+		slashCommands.push(command.data.toJSON());
+	}
 });
 
 (async () => {
@@ -40,7 +42,7 @@ async function handleInteraction(interaction) {
 			const commandName = interaction.commandName;
 			console.log(`(/) ${interaction.user.displayName} usó el comando "${interaction}"`);
 			const command = require(`./slash_commands/${commandName}.slash.js`);
-			await command.execute(interaction);
+			await command.execute(interaction, client);
 		} catch (error) {
 			console.group("(/) SLASH COMMAND ERROR HANDLER (/)");
 				console.error(`ERROR: Ocurrió un error al momento de ejecutar el comando "${interaction}".`);
@@ -56,7 +58,7 @@ async function handleInteraction(interaction) {
 			const menuName = interaction.customId;
 			console.log(`(📝) ${interaction.user.displayName} seleccionó la opción "${interaction.values[0]}" del menú "${menuName}"`);
 			const menuToExecute = require(`./select_menus/${menuName}.menu.js`);
-			await menuToExecute(interaction);
+			await menuToExecute(interaction, client);
 		} catch (error) {
 			console.group("(📝) SELECT MENU INTERACTION ERROR HANDLER (📝)");
 				console.error(`ERROR: Ocurrió un error al momento de ejecutar la opción "${interaction}" en un menu.`);
@@ -90,7 +92,7 @@ async function handleTextCommand(message) {
 	try {
 		console.log(`(!) ${message.author.displayName} usó el comando "!${commandName}"`);
 		const commandToExecute = require(`./text_commands/${commandName}.text.js`);
-		await commandToExecute(message);
+		await commandToExecute(message, client);
 	} catch (error) {
 		console.group("(!) TEXT COMMAND ERROR HANDLER (!)");
 			console.error(`ERROR: Ocurrió un error al momento de ejecutar el comando "!${commandName}".`);

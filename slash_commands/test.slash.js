@@ -5,7 +5,7 @@ module.exports = {
 		.setName("test")
 		.setDescription("Comando de Prueba del Bot."),
 
-	async execute(interaction) {
+	async execute(interaction, client) {
 		await interaction.reply("Funcionando.");
 	}
 }

@@ -9,7 +9,7 @@ module.exports = {
 			.setDescription("Usuario del que se mostrará el avatar.")
 		),
 
-	async execute(interaction) {
+	async execute(interaction, client) {
 		const user = interaction.options.getUser("usuario") || interaction.user;
 		const embed = {
 			description: `Avatar de ${user.displayName}`,
