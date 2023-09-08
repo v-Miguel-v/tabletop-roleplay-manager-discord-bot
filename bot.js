@@ -53,6 +53,7 @@ async function handleInteraction(interaction) {
 		}
 	}
 
+	/*
 	if (interaction.isAnySelectMenu()) { // Select Menu Handler
 		try {
 			const menuName = interaction.customId;
@@ -68,6 +69,7 @@ async function handleInteraction(interaction) {
 			console.groupEnd("(📝) SELECT MENU INTERACTION ERROR HANDLER (📝)");
 		}
 	}
+	*/
 }
 
 // Text Command Update
