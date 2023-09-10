@@ -98,7 +98,7 @@ async function handleTextCommand(message) {
 	} catch (error) {
 		console.group("(!) TEXT COMMAND ERROR HANDLER (!)");
 			console.error(`ERROR: Ocurrió un error al momento de ejecutar el comando "!${commandName}".`);
-			console.error(`${message.author} redactó el siguiente mensaje: "${message}".`);
+			console.error(`${message.author.displayName} redactó el siguiente mensaje: "${message}".`);
 			console.error("Y eso ocasionó el siguiente error:");
 			console.error(error);
 		console.groupEnd("TEXT COMMAND ERROR HANDLER");
