@@ -8,7 +8,7 @@ function defineMenus() {
 */
 
 const types = [];
-const typeNames = fs.readdirSync("./extras/character_sheet_types").map(x => x.replace(/_/g, " "));
+const typeNames = fs.readdirSync("./local_database/character_sheet_types").map(x => x.replace(/_/g, " "));
 typeNames.forEach(typeName => { types.push({ label: typeName, value: typeName }) });
 
 const firstTypeMenu = new StringSelectMenuBuilder({

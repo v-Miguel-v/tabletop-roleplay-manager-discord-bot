@@ -213,7 +213,6 @@ $RECYCLE.BIN/
 *.lnk
 
 # Extras
-extras/character_sheet_types
-extras/character_sheets_saved
+local_database
 
 # End of https://www.toptal.com/developers/gitignore/api/windows,node,macos,linux

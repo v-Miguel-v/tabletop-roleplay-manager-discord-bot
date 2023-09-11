@@ -1,5 +1,7 @@
 const tools = require("./mdd/tools");
 const steps = require("./mdd/steps");
+const log = require("./../utils/logger");
+const handleError = require("./../utils/errorHandler");
 const { SlashCommandBuilder, Events } = require("discord.js");
 
 module.exports = {
@@ -21,7 +23,7 @@ module.exports = {
 				const step = keys[currentIteration-1];
 				const initialEmbed = steps[step].initialEmbed;
 				const initialComponents = steps[step].initialComponents;
-				const previousMessage = await user.send({ embeds: [initialEmbed], components: initialComponents });
+				let previousMessage = await user.send({ embeds: [initialEmbed], components: initialComponents });
 				const userPrivateChannel = previousMessage.channelId;
 
 				if (steps[step].type === "input") {
@@ -41,11 +43,16 @@ module.exports = {
 					async function confirmInput(interaction) {
 						const acceptButtonId = steps[step].confirmationComponents[0].components[0].data.custom_id;
 						if (interaction.isButton() && interaction.customId === acceptButtonId) {
-							client.off(Events.MessageCreate, registerInput);
-							client.off(Events.InteractionCreate, confirmInput);
-							await previousMessage.delete();
-							currentIteration++;
-							executeIteration();
+							try {
+								log.buttonInteraction(interaction);
+								client.off(Events.MessageCreate, registerInput);
+								client.off(Events.InteractionCreate, confirmInput);
+								await previousMessage.delete();
+								currentIteration++;
+								executeIteration();
+							} catch (error) {
+								handleError.buttonInteraction(interaction, error);
+							}
 						}
 					}
 
@@ -57,24 +64,41 @@ module.exports = {
 					async function registerSelection(interaction) {
 						const selectMenuId = steps[step].initialComponents[0].components[0].data.custom_id;
 						if (interaction.isAnySelectMenu() && interaction.customId === selectMenuId) {
-							steps[step].value = interaction.values;
-							const selection = tools.formatSelectedOptions(interaction.values);
-							const confirmationEmbed = steps[step].confirmationEmbed(selection);
-							const confirmationComponents = steps[step].confirmationComponents;
-							await previousMessage.edit({ embeds: [confirmationEmbed], components: confirmationComponents });
+							try {
+								log.menuInteraction(interaction);
+								steps[step].value = interaction.values;
+								const selection = tools.formatSelectedOptions(interaction.values);
+								const confirmationEmbed = steps[step].confirmationEmbed(selection);
+								const confirmationComponents = steps[step].confirmationComponents;
+								await previousMessage.delete();
+								previousMessage = await user.send({ embeds: [confirmationEmbed], components: confirmationComponents });
+							} catch (error) {
+								handleError.menuInteraction(interaction, error);
+							}
 						}
 
 						const acceptButtonId = steps[step].confirmationComponents[0].components[0].data.custom_id;
 						if (interaction.isButton() && interaction.customId === acceptButtonId) {
-							client.off(Events.InteractionCreate, registerSelection);
-							await previousMessage.delete();
-							currentIteration++;
-							executeIteration();
+							try {
+								log.buttonInteraction(interaction);
+								client.off(Events.InteractionCreate, registerSelection);
+								await previousMessage.delete();
+								currentIteration++;
+								executeIteration();
+							} catch (error) {
+								handleError.buttonInteraction(interaction, error);
+							}
 						}
 
 						const rejectButtonId = steps[step].confirmationComponents[0].components[1].data.custom_id;
 						if (interaction.isButton() && interaction.customId === rejectButtonId) {
-							await previousMessage.edit({ embeds: [initialEmbed], components: initialComponents });
+							try {
+								log.buttonInteraction(interaction);
+								await previousMessage.delete();
+								previousMessage = await user.send({ embeds: [initialEmbed], components: initialComponents });
+							} catch (error) {
+								handleError.buttonInteraction(interaction, error);
+							}
 						}
 					}
 
