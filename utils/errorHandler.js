@@ -25,6 +25,34 @@ module.exports = {
 		console.groupEnd(`${symbol} ${title} ${symbol}`);
 	},
 
+	userCommand(interaction, error) {
+		const symbol = "👤";
+		const user = interaction.user.displayName;
+		const target = interaction.targetUser.displayName;
+		const command = `${interaction.commandName}`;
+		const title = "MANEJADOR DE ERRORES DE COMANDOS USER";
+		console.group(`${symbol} ${title} ${symbol}`);
+			console.error(`ERROR: Ocurrió un error al momento de ejecutar el comando "${command}"`);
+			console.error(`${user} fue quién ejecutó el comando sobre ${target}.`);
+			console.error("Y eso ocasionó el siguiente error:");
+			console.error(error);
+		console.groupEnd(`${symbol} ${title} ${symbol}`);
+	},
+
+	messageCommand(interaction, error) {
+		const symbol = "📨";
+		const user = interaction.user.displayName;
+		const target = interaction.targetMessage.author.displayName;
+		const command = `${interaction.commandName}`;
+		const title = "MANEJADOR DE ERRORES DE COMANDOS MESSAGE";
+		console.group(`${symbol} ${title} ${symbol}`);
+			console.error(`ERROR: Ocurrió un error al momento de ejecutar el comando "${command}"`);
+			console.error(`${user} fue quién ejecutó el comando sobre un mensaje de ${target}.`);
+			console.error("Y eso ocasionó el siguiente error:");
+			console.error(error);
+		console.groupEnd(`${symbol} ${title} ${symbol}`);
+	},
+
 	buttonInteraction(interaction, error) {
 		const symbol = "(🔘)";
 		const user = interaction.user.displayName;

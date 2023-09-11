@@ -13,7 +13,7 @@ const rest = new REST({ version: "10" }).setToken(TOKEN);
 
 // Upload of commands
 const existingTextCommands = upload.textCommands();
-upload.slashCommands(rest, CLIENT_ID);
+upload.applicationCommands(rest, CLIENT_ID);
 
 // When Client is Ready...
 client.on(Events.ClientReady, () => { console.log("El cliente está listo para su ejecución.\n"); });
@@ -24,6 +24,12 @@ async function detectInteraction(interaction) {
 	if (interaction.isChatInputCommand()) {
 		handleInteraction.slashCommand(interaction, client);
 	}
+	if (interaction.isUserContextMenuCommand()) {
+		handleInteraction.userCommand(interaction, client);
+	}
+	if (interaction.isMessageContextMenuCommand()) {
+		handleInteraction.messageCommand(interaction, client);
+	}
 }
 
 // Text Command Detector
@@ -33,9 +39,8 @@ async function detectTextCommand(message) {
 	const commandName = message.content.toLowerCase().slice(1).split(" ")[0];
 
 	// Validators.
-	if(message.author.bot) return;
-	if(!message.content.startsWith("!")) return;
 	if (!existingTextCommands.includes(commandName)) return;
+	if (!message.content.startsWith("!") || message.author.bot) return;
 
 	// Execution.
 	handleInteraction.textCommand(message, client);

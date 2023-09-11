@@ -24,6 +24,22 @@ module.exports = {
 		console.info(`${symbol} ${user} usó el comando "${command}"`);
 	},
 
+	userCommand(interaction) { // Incomplete.
+		const symbol = "👤";
+		const user = interaction.user.displayName;
+		const target = interaction.targetUser.displayName;
+		const command = `${interaction.commandName}`;
+		console.info(`${symbol} ${user} usó el comando "${command}" con ${target}`);
+	},
+
+	messageCommand(interaction) { // Incomplete.
+		const symbol = "📨";
+		const user = interaction.user.displayName;
+		const target = interaction.targetMessage.author.displayName;
+		const command = `${interaction.commandName}`;
+		console.info(`${symbol} ${user} usó el comando "${command}" con un mensaje de ${target}`);
+	},
+
 	buttonInteraction(interaction) {
 		const symbol = "(🔘)";
 		const user = interaction.user.displayName;
@@ -38,5 +54,14 @@ module.exports = {
 		const options = interaction.values.length;
 		const selection = formatSelectedOptions(interaction.values);
 		console.info(`${symbol} ${user} seleccionó ${(options > 2) ? "las opciones" : "la opción"} <${selection}> del menú "${menu}"`);
+	},
+
+	commandsUpdated(commands, symbol, type) {
+		const logGroupTitle = `${symbol} Comandos de tipo ${type} Cargados ${symbol}: ${commands.length}`;
+		console.group(logGroupTitle);
+			if (type === "TEXTO") commands.forEach(command => console.info(`✅) ${command}`));
+			else commands.map(command => command.name).forEach(command => console.info(`✅) ${command}`));
+		console.groupEnd(logGroupTitle);
+		console.log("");
 	}
 }

@@ -1,7 +1,7 @@
 const tools = require("./mdd/tools");
 const steps = require("./mdd/steps");
-const log = require("./../utils/logger");
-const handleError = require("./../utils/errorHandler");
+const log = require("./../../utils/logger");
+const handleError = require("./../../utils/errorHandler");
 const { SlashCommandBuilder, Events } = require("discord.js");
 
 module.exports = {

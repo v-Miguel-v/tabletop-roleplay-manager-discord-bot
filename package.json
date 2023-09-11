@@ -5,7 +5,7 @@
   "main": "bot.js",
   "scripts": {
     "test": "node .",
-    "dev": "nodemon . --ignore ./extras/character_sheets_saved"
+    "dev": "nodemon . --ignore ./local_database/character_sheets_saved"
   },
   "keywords": [
     "dnd5e",

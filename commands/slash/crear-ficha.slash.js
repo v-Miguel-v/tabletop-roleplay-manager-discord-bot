@@ -1,6 +1,6 @@
 const fs = require("node:fs");
 const { SlashCommandBuilder, ChannelType } = require("discord.js");
-const createEmptyCharacterSheet = require("../local_database/tools/createEmptyCharacterSheet");
+const createEmptyCharacterSheet = require("./../../local_database/tools/createEmptyCharacterSheet");
 
 const types = [];
 const typeNames = fs.readdirSync("./local_database/character_sheet_types").map(x => x.replace(/_/g, " "));

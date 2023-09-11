@@ -1,51 +1,45 @@
+const globalRoute = "commands";
 const fs = require("node:fs");
+const log = require("./logger");
 const { Routes } = require("discord.js");
+
+function uploadCommands(type) {
+	const commandsUploaded = [];
+	const localRoute = `${globalRoute}/${type}`;
+	fs.readdirSync(`./${localRoute}`).forEach(file => {
+		if (file.endsWith(`.${type}.js`)) {
+			const command = (type === "text") ? file.split(".text.js")[0] : require(`./../${localRoute}/${file}`);
+			commandsUploaded.push( (type) === "text" ? command : command.data.toJSON() );
+		}
+	})
+	return commandsUploaded;
+}
 
 module.exports = {
 	textCommands() {
-		// Upload commands.
-		const textCommands = [];
-		fs.readdirSync("./text_commands").forEach(file => {
-			if (file.endsWith(".text.js")) {
-				const command = file.split(".text.js")[0];
-				textCommands.push(command);
-			}
-		});
-
-		// Log uploaded commands.
-		const symbol = "(❕)";
-		const logGroupTitle = `${symbol} Comandos de TEXTO Cargados ${symbol}: ${textCommands.length}`;
-		console.group(logGroupTitle);
-			textCommands.forEach(command => console.info(`✅) ${command}`));
-		console.groupEnd(logGroupTitle);
-		console.log("");
-
-		// Array with all uploaded commands.
+		const textCommands = uploadCommands("text");
+		log.commandsUpdated(textCommands, "❕", "TEXTO");
 		return textCommands;
 	},
 
-	async slashCommands(rest, CLIENT_ID) {
+	async applicationCommands(rest, CLIENT_ID) {
 		try {
-			// Upload commands.
-			const slashCommands = [];
-			fs.readdirSync("./slash_commands").forEach(file => {
-				if (file.endsWith(".slash.js")) {
-					const command = require(`./../slash_commands/${file}`);
-					slashCommands.push(command.data.toJSON());
-				}
+			// Upload user, slash and message commands.
+			const userCommands = uploadCommands("user");
+			const slashCommands = uploadCommands("slash");
+			const messageCommands = uploadCommands("message");
+			await rest.put(Routes.applicationCommands(CLIENT_ID), {
+				body: [...userCommands, ...slashCommands, ...messageCommands]
 			});
-			await rest.put(Routes.applicationCommands(CLIENT_ID), { body: slashCommands });
 
 			// Log uploaded commands.
-			const symbol = "{/}";
-			const logGroupTitle = `${symbol} Comandos SLASH Cargados ${symbol}: ${slashCommands.length}`;
-			console.group(logGroupTitle);
-				slashCommands.map(command => command.name).forEach(command => console.info(`✅) ${command}`));
-			console.groupEnd(logGroupTitle);
-			console.log("");
+			log.commandsUpdated(userCommands, "👤", "USER");
+			log.commandsUpdated(slashCommands, "{/}", "SLASH");
+			log.commandsUpdated(messageCommands, "📨", "MESSAGE");
+
 		} catch (error) {
 			// Error handler.
-			console.error("Ocurrió un ERROR en la actualización y subida de los comandos slash:");
+			console.error("Ocurrió un ERROR en la actualización y subida de los comandos de aplicación:");
 			console.error(error);
 		}
 	}
