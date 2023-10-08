@@ -30,6 +30,9 @@ async function detectInteraction(interaction) {
 	if (interaction.isMessageContextMenuCommand()) {
 		handleInteraction.messageCommand(interaction, client);
 	}
+	if (interaction.isAutocomplete()) {
+		handleInteraction.autocomplete(interaction, client);
+	}
 }
 
 // Text Command Detector

@@ -15,6 +15,7 @@ module.exports = {
 		const user = message.author.displayName;
 		const command = message.content.toLowerCase().split(" ")[0];
 		console.info(`${symbol} ${user} usó el comando "${command}"`);
+		console.info(`Comando Completo: "${message}"`);
 	},
 
 	slashCommand(interaction) {
@@ -22,9 +23,10 @@ module.exports = {
 		const user = interaction.user.displayName;
 		const command = `/${interaction.commandName}`;
 		console.info(`${symbol} ${user} usó el comando "${command}"`);
+		console.info(`Comando Completo: "${interaction}"`);
 	},
 
-	userCommand(interaction) { // Incomplete.
+	userCommand(interaction) {
 		const symbol = "👤";
 		const user = interaction.user.displayName;
 		const target = interaction.targetUser.displayName;
@@ -32,7 +34,7 @@ module.exports = {
 		console.info(`${symbol} ${user} usó el comando "${command}" con ${target}`);
 	},
 
-	messageCommand(interaction) { // Incomplete.
+	messageCommand(interaction) {
 		const symbol = "📨";
 		const user = interaction.user.displayName;
 		const target = interaction.targetMessage.author.displayName;

@@ -48,5 +48,21 @@ module.exports = {
 		} catch (error) {
 			handleError.messageCommand(interaction, error);
 		}
-	}
+	},
+
+	async autocomplete(interaction, client) {
+		try {
+			const command = require(`./../commands/slash/${interaction.commandName}.slash.js`);
+
+			if (!command) {
+				console.error(`No se encontró ningún comando que coincida con el comando "${interaction.commandName}" ingresado.`);
+				return;
+			}
+
+			await command.autocomplete(interaction, client);
+		} catch (error) {
+			console.error("Error de Autocompletado", error);
+			// handleError.slashCommand(interaction, error);
+		}
+	},
 }

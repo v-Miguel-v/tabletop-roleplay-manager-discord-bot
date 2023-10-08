@@ -20,6 +20,7 @@ module.exports = {
 		console.group(`${symbol} ${title} ${symbol}`);
 			console.error(`ERROR: Ocurrió un error al momento de ejecutar el comando "${command}"`);
 			console.error(`${user} fue quién ejecutó el comando.`);
+			console.error(`El comando completo ejecutado fue: "${interaction}"`);
 			console.error("Y eso ocasionó el siguiente error:");
 			console.error(error);
 		console.groupEnd(`${symbol} ${title} ${symbol}`);
