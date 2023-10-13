@@ -47,18 +47,18 @@ module.exports = {
 		let choices = searchIndexes[`${trpgSelected}_index`];
 		const filtered = choices.filter(choice => {
 			const regex = /[\s()\[\]]/g; // All Spaces, () and [].
-			const inputs = input.split(" ").filter(x => x !== "");
+			const inputs = input.split(regex).filter(x => x !== "");
 			const words = choice.toLowerCase().split(regex).filter(x => x !== "");
-			// return words.some(word => word.startsWith(input)); // Versión Antigua
-			if (inputs.length > words.length) return false; // Si la cantidad de palabras ingresadas en el input es mayor a cualquier cantidad de palabras de los resultados, directamente no encontrará ningún resultado, así que retorna "false".
-			const copiedWords = [...words]; // Copiamos el array words ya que, para poder realizar adecuadamente el funcionamiento de la barra de búsqueda necesitaremos modificar y eliminar elmentos del array, así que para no alterar el original creamos una copia.
-			inputs.forEach(input => { // Para cada una de las palabras del input...
-				let indexToDelete = null; // 1. Inicializamos una variable "indexToDelete" en null.
-				if (copiedWords.some((word, index) => { // 2. (Condicional) Preguntamos: ¿En la lista de palabras (copiadas) de los resultados "words", hay alguna que empiece con la palabra actual del input?
-					indexToDelete = index; // 2.1 Guardamos el índice de la palabra "word" del resultado que hizo match con el input.
-					return word.startsWith(input); // 2.2 Verificamos la condición.
+			// return words.some(word => word.startsWith(input)); //// Versión Antigua
+			if (inputs.length > words.length) return false; 		//* Si la cantidad de palabras ingresadas en el input es mayor a cualquier cantidad de palabras de los resultados, directamente no encontrará ningún resultado, así que retorna "false".
+			const copiedWords = [...words]; 						//* Copiamos el array words ya que, para poder realizar adecuadamente el funcionamiento de la barra de búsqueda necesitaremos modificar y eliminar elmentos del array, así que para no alterar el original creamos una copia.
+			inputs.forEach(input => { 								//* Para cada una de las palabras del input...
+				let indexToDelete = null; 								//* 1. Inicializamos una variable "indexToDelete" en null.
+				if (copiedWords.some((word, index) => { 				//* 2. (Condicional) Preguntamos: ¿En la lista de palabras (copiadas) de los resultados "words", hay alguna que empiece con la palabra actual del input?
+					indexToDelete = index; 									//* 2.1 Guardamos el índice de la palabra "word" del resultado que hizo match con el input.
+					return word.startsWith(input); 							//* 2.2 Verificamos la condición.
 				})) {
-					copiedWords.splice(indexToDelete, 1); // 3. Si la condición se cumple, antes de pasar a la siguiente palabra del input, borramos de la copia de la lista de palabras del resultado (copiedWords) la palabra con el índice que hizo match. Así, para la siguiente iteración, esa palabra no estará.
+					copiedWords.splice(indexToDelete, 1); 				//* 3. Si la condición se cumple, antes de pasar a la siguiente palabra del input, borramos de la copia de la lista de palabras del resultado (copiedWords) la palabra con el índice que hizo match. Así, para la siguiente iteración, esa palabra no estará.
 				}
 			});
 			const allInputsMatched = (words.length - inputs.length) === (copiedWords.length); // Tras finalizar el forEach, y por tanto la evaluación del fragmento de código anterior para todas y cada una de las palabras del input... verificamos si todas las palabras hicieron Match mediante una resta. Si todas las palabras hicieron match, entonces a copiedWords se le borraron una cantidad de elementos iguales a la cantidad de elementos del input (porque precisamente los elementos del input eran los que se estaban iterando). En otras palabras: Si restamos de la cantidad de palabras del resultado (words) la cantidad de palabras del input (input), el resultado debería ser igual a la cantidad actual de elementos de la copia luego de la iteración si todas las palabras hicieron match.
