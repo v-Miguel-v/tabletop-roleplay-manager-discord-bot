@@ -1,17 +1,26 @@
-const globalRoute = "commands";
 const fs = require("node:fs");
 const log = require("./logger");
 const { Routes } = require("discord.js");
 
+const globalRoute = "commands";
 function uploadCommands(type) {
 	const commandsUploaded = [];
 	const localRoute = `${globalRoute}/${type}`;
 	fs.readdirSync(`./${localRoute}`).forEach(file => {
-		if (file.endsWith(`.${type}.js`)) {
-			const command = (type === "text") ? file.split(".text.js")[0] : require(`./../${localRoute}/${file}`);
-			commandsUploaded.push( (type) === "text" ? command : command.data.toJSON() );
+		if ( file.endsWith(`.${type}.js`) ) {
+			const command = require(`./../${localRoute}/${file}`);
+			if (type === "text") {
+				const matchesForCommand = {
+					aliases: [command.data.name, ...command.data.aliases],
+					regexes: [...command.data.regexes],
+					associatedCommandName: command.data.name
+				}
+				commandsUploaded.push( matchesForCommand );
+			} else {
+				commandsUploaded.push( command.data.toJSON() );
+			}
 		}
-	})
+	});
 	return commandsUploaded;
 }
 

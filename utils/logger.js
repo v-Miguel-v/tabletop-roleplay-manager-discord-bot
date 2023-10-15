@@ -10,10 +10,9 @@ function formatSelectedOptions(array) {
 }
 
 module.exports = {
-	textCommand(message) {
+	textCommand(command, message) {
 		const symbol = "(❕)";
 		const user = message.author.displayName;
-		const command = message.content.toLowerCase().split(" ")[0];
 		console.info(`${symbol} ${user} usó el comando "${command}"`);
 		console.info(`Comando Completo: "${message}"`);
 	},
@@ -61,8 +60,7 @@ module.exports = {
 	commandsUpdated(commands, symbol, type) {
 		const logGroupTitle = `${symbol} Comandos de tipo ${type} Cargados ${symbol}: ${commands.length}`;
 		console.group(logGroupTitle);
-			if (type === "TEXTO") commands.forEach(command => console.info(`✅) ${command}`));
-			else commands.map(command => command.name).forEach(command => console.info(`✅) ${command}`));
+			commands.map(cmd => (type === "TEXTO") ? cmd.associatedCommandName : cmd.name).forEach(cmd => console.info(`✅) ${cmd}`));
 		console.groupEnd(logGroupTitle);
 		console.log("");
 	}

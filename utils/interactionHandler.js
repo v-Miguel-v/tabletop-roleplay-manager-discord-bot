@@ -4,14 +4,14 @@ const userCommandsRoutes = require("./../commands/user/routes");
 const messageCommandsRoutes = require("./../commands/message/routes");
 
 module.exports = {
-	async textCommand(message, client) {
+	async textCommand(commandName, message, client) {
 		try {
-			log.textCommand(message);
-			const commandName = message.content.toLowerCase().slice(1).split(" ")[0];
-			const commandToExecute = require(`./../commands/text/${commandName}.text.js`);
-			await commandToExecute(message, client);
+			if (commandName === null) return;
+			log.textCommand(commandName, message);
+			const command = require(`./../commands/text/${commandName}.text.js`);
+			await command.execute(message, client);
 		} catch (error) {
-			handleError.textCommand(message, error);
+			handleError.textCommand(commandName, message, error);
 		}
 	},
 

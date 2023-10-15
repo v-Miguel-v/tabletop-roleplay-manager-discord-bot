@@ -1,8 +1,7 @@
 module.exports = {
-	textCommand(message, error) {
+	textCommand(command, message, error) {
 		const symbol = "(❕)";
 		const user = message.author.displayName;
-		const command = message.content.toLowerCase().split(" ")[0];
 		const title = "MANEJADOR DE ERRORES DE COMANDOS DE TEXTO";
 		console.group(`${symbol} ${title} ${symbol}`);
 			console.error(`ERROR: Ocurrió un error al momento de ejecutar el comando "${command}"`);
