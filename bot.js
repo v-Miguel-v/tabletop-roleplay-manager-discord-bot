@@ -21,7 +21,7 @@ client.on(Events.ClientReady, () => { console.log("El cliente está listo para s
 client.on(Events.MessageCreate, detectTextCommand);
 async function detectTextCommand(message) {
 	if (message.author.bot) return;
-	const commandTextPrefix = getTextCommandPrefix(message.guild.id);
+	const commandTextPrefix = getTextCommandPrefix(message.guild?.id);
 	const command = identifyTextCommand(message, commandTextPrefix, existingTextCommands);
 	handleInteraction.textCommand(command, message, client);
 }

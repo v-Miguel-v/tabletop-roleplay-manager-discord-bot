@@ -5,7 +5,8 @@ module.exports = {
 		name: "ping",
 		description: "Comprueba el nivel de conectividad y latencia actual del bot con discord.",
 		aliases: ["test"],
-		regexes: []
+		regexes: [],
+		regexesWithPrefix: []
 	},
 
 	async execute(message, client) {
@@ -31,7 +32,7 @@ module.exports = {
 		const sentTime = message.createdTimestamp;
 		const responseTime = response.createdTimestamp;
 		fullSentResponsePing = `${responseTime - sentTime}ms`;
-		response.edit({
+		await response.edit({
 			embeds: [
 				new EmbedBuilder({
 					fields: [{

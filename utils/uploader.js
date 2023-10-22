@@ -13,6 +13,7 @@ function uploadCommands(type) {
 				const matchesForCommand = {
 					aliases: [command.data.name, ...command.data.aliases],
 					regexes: [...command.data.regexes],
+					regexesWithPrefix: [...command.data.regexesWithPrefix],
 					associatedCommandName: command.data.name
 				}
 				commandsUploaded.push( matchesForCommand );
