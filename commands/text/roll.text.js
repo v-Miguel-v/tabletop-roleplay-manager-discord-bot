@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require("discord.js");
-const { getTextCommandPrefix } = require("./../../utils/textCommandTools");
+const { getTextCommandPrefix, removePrefixAndKeywordsFromMessage } = require("./../../utils/textCommandTools");
 function getRandomNumber(maxValue) { return Math.floor((Math.random() * maxValue) + 1) }
 const diceNotation = /^(\d+#)?((\d+[\-+*\/])*)((\d*)d(\d+|f))((k|kh|kl|d|dh|dl)(\d*))?(([\-+*\/]\d+)*)(([\-+*\/]\d*d(\d+|f)((k|kh|kl|d|dh|dl)\d*)?([\-+*\/]\d+)*)*)(?=[\s\n]|$)/i;
 
@@ -13,21 +13,8 @@ module.exports = {
 	},
 
 	async execute(message, client) {
-		const prefix = getTextCommandPrefix(message.guild.id);
-		let commandRollData = null;
-
-		// Removing Prefix from the original message
-		if (message.content.startsWith(prefix)) {
-			const commandWithoutPrefix = message.content.slice(prefix.length);
-			const keywords = [this.data.name, ...this.data.aliases];
-			keywords.forEach(keyword => {
-				const regex = new RegExp(`^${keyword} `, "i");
-				if (regex.test(commandWithoutPrefix)) commandRollData = commandWithoutPrefix.slice(keyword.length+1);
-			});
-			if (!commandRollData) commandRollData = commandWithoutPrefix;
-		} else {
-			commandRollData = message.content;
-		}
+		const prefix = getTextCommandPrefix(message.guild?.id);
+		let commandRollData = removePrefixAndKeywordsFromMessage(prefix, this.data, message);
 
 		// Notation Validation
 		if (!diceNotation.test(commandRollData)) {

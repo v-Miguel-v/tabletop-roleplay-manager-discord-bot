@@ -41,5 +41,22 @@ module.exports = {
 			const guildPrefix = fs.readFileSync(`${path}/${guildId}`, "utf-8");
 			return guildPrefix;
 		}
+	},
+
+	removePrefixAndKeywordsFromMessage(prefix, keywords, originalMessage) {
+		let messageWithoutPrefixAndKeywords = null;
+
+		if (originalMessage.content.startsWith(prefix)) {
+			const messageWithoutPrefix = originalMessage.content.slice(prefix.length);
+			keywords.forEach(keyword => {
+				if (messageWithoutPrefix.startsWith(`${keyword} `))
+					messageWithoutPrefixAndKeywords = messageWithoutPrefix.slice(keyword.length).trim();
+			});
+			if (!messageWithoutPrefixAndKeywords) messageWithoutPrefixAndKeywords = messageWithoutPrefix;
+		} else {
+			messageWithoutPrefixAndKeywords = originalMessage.content;
+		}
+
+		return messageWithoutPrefixAndKeywords;
 	}
 }

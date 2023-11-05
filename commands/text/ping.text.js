@@ -22,7 +22,7 @@ module.exports = {
 						_Intervalo promedio que tardan las señales enviadas entre el bot y discord._
 
 						**Full Sent-Response Ping:** \`${fullSentResponsePing}\` 📶
-						_Intervalo que tarda una señal de ida y vuelta enviada entre el bot y discord (desde la creación del mensaje de comando hasta la creación del mensaje de respuesta)._
+						_Intervalo que tarda una señal de ida y vuelta enviada entre el bot y discord (desde el envío del mensaje con el comando hasta el envío del mensaje de respuesta)._
 						`
 					}]
 				})
@@ -42,7 +42,7 @@ module.exports = {
 						_Intervalo promedio que tardan las señales enviadas entre el bot y discord._
 
 						**Full Sent-Response Ping:** \`${fullSentResponsePing}\` 📶
-						_Intervalo que tarda una señal de ida y vuelta enviada entre el bot y discord (desde la creación del mensaje de comando hasta la creación del mensaje de respuesta)._
+						_Intervalo que tarda una señal de ida y vuelta enviada entre el bot y discord (desde el envío del mensaje con el comando hasta el envío del mensaje de respuesta)._
 						`
 					}]
 				})
