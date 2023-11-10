@@ -112,17 +112,10 @@ math.import({
 	"pickRandom":			function () { throw new Error("Function name is disabled") },
 
 	// Relational functions
-	"compare":				function () { throw new Error("Function compare is disabled") },
 	"compareNatural":		function () { throw new Error("Function compareNatural is disabled") },
 	"compareText":			function () { throw new Error("Function compareText is disabled") },
 	"deepEqual":			function () { throw new Error("Function deepEqual is disabled") },
-	"equal":				function () { throw new Error("Function equal is disabled") },
 	"equalText":			function () { throw new Error("Function equalText is disabled") },
-	"larger":				function () { throw new Error("Function larger is disabled") },
-	"largerEq":				function () { throw new Error("Function largerEq is disabled") },
-	"smaller":				function () { throw new Error("Function smaller is disabled") },
-	"smallerEq":			function () { throw new Error("Function smallerEq is disabled") },
-	"unequal":				function () { throw new Error("Function unequal is disabled") },
 
 	// Set functions
 	"setCartesian":			function () { throw new Error("Function setCartesian is disabled") },

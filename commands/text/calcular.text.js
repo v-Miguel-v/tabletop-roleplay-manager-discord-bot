@@ -13,9 +13,11 @@ module.exports = {
 	},
 
 	async execute(message, client) {
+		// Get input (mathematical operation)
 		const prefix = getTextCommandPrefix(message.guild?.id);
 		const keywords = [this.data.name, ...this.data.aliases];
 		const input = removePrefixAndKeywordsFromMessage(prefix, keywords, message);
+
 		try {
 			const result = evaluate(input);
 			const responseEmbed = new EmbedBuilder({
@@ -24,7 +26,7 @@ module.exports = {
 			});
 			message.reply({embeds:[responseEmbed]});
 		} catch (error) {
-			await message.reply("Error");
+			await message.reply("Error 😢");
 			console.log(error);
 		}
 	}

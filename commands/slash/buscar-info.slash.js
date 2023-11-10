@@ -68,6 +68,6 @@ module.exports = {
 	},
 
 	async execute(interaction, client) {
-		interaction.reply("Working");
+		interaction.reply("Chambeando 😌✨");
 	}
 }

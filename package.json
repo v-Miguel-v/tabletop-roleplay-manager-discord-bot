@@ -4,8 +4,9 @@
   "description": "Un bot de discord para jugar y gestionar partidas de rol de mesa.",
   "main": "bot.js",
   "scripts": {
-    "test": "node .",
-    "dev": "nodemon . --ignore ./local_database/character_sheets_saved"
+    "start": "node .",
+    "dev": "nodemon . --ignore ./local_database/character_sheets_saved",
+    "debug": "nodemon --inspect . --ignore ./local_database/character_sheets_saved"
   },
   "keywords": [
     "dnd5e",
