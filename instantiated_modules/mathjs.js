@@ -47,8 +47,6 @@ math.import({
 	"invmod":				function () { throw new Error("Function invmod is disabled") },
 	"log1p":				function () { throw new Error("Function log1p is disabled") },
 	"norm":					function () { throw new Error("Function norm is disabled") },
-	"unaryMinus":			function () { throw new Error("Function unaryMinus is disabled") },
-	"unaryPlus":			function () { throw new Error("Function unaryPlus is disabled") },
 	"xgcd":					function () { throw new Error("Function xgcd is disabled") },
 
 	// Combinatorics functions

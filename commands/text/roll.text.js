@@ -1,69 +1,13 @@
 const { EmbedBuilder } = require("discord.js");
+
 const evaluate = require("./../../instantiated_modules/mathjs");
+const { rollDice, isAnValidDice } = require("./roll/tools");
 const { getTextCommandPrefix, removePrefixAndKeywordsFromMessage } = require("./../../utils/textCommandTools");
+
 const repetitionNotation = /^(\d+)#/i;
 const diceDetector = /(\d*)d(\d+|f)((kh|kl|dh|dl|k|d)(\d*))?/ig;
 const diceDestructurator = /(\d*)d(\d+|f)((kh|kl|dh|dl|k|d)(\d*))?/i;
 const rollCommandRegex = /^(\d+#)?(-?([\d\(\)]+\s*[\-+*\/]\s*)*)((\d*)d(\d+|f))((k|kh|kl|d|dh|dl)(\d*))?((\s*[\-+*\/]\s*[\d\(\)]+)*)((\s*[\-+*\/]\s*\d*d(\d+|f)((k|kh|kl|d|dh|dl)\d*)?(\s*[\-+*\/]\s*[\d\(\)]+)*)*)(?=[\s\n]|$)/i;
-
-function getRandomNumber(maxValue) { return Math.floor((Math.random() * maxValue) + 1) }
-function rollDice(dice, quantity, faces, keepdropingType, keepdropingAmount) {
-	const result = {};
-	result.diceRolled = dice;
-	result.results = [];
-	for (let i=0; i<quantity; i++) {
-		result.results.push(getRandomNumber(faces));
-	}
-	if (keepdropingType) {
-		const amnt = keepdropingAmount;
-		const type = keepdropingType.toLowerCase();
-
-		if (type === "kh" || type === "k") {
-			result.highests = [];
-			const relativeResults = [...result.results];
-			for (let i=0; i<amnt; i++) {
-				const maxValue = Math.max(...relativeResults);
-				const valueIndex = relativeResults.findIndex(x => x === maxValue);
-				result.highests.push(maxValue);
-				relativeResults.splice(valueIndex, 1);
-			}
-		}
-		if (type === "kl") {
-			result.lowests = [];
-			const relativeResults = [...result.results];
-			for (let i=0; i<amnt; i++) {
-				const minValue = Math.min(...relativeResults);
-				const valueIndex = relativeResults.findIndex(x => x === minValue);
-				result.lowests.push(minValue);
-				relativeResults.splice(valueIndex, 1);
-			}
-		}
-		if (type === "dl" || type === "d") {
-			const relativeResults = [...result.results];
-			for (let i=0; i<amnt; i++) {
-				const minValue = Math.min(...relativeResults);
-				const valueIndex = relativeResults.findIndex(x => x === minValue);
-				relativeResults.splice(valueIndex, 1);
-			}
-			result.highestsNotDropped = [...relativeResults];
-		}
-		if (type === "dh") {
-			const relativeResults = [...result.results];
-			for (let i=0; i<amnt; i++) {
-				const maxValue = Math.max(...relativeResults);
-				const valueIndex = relativeResults.findIndex(x => x === maxValue);
-				relativeResults.splice(valueIndex, 1);
-			}
-			result.lowestsNotDropped = [...relativeResults];
-		}
-	}
-
-	const keys = Object.keys(result);
-	if (keys.length > 2) result.total = result[keys[2]].reduce((a,b) => a+b);
-	else result.total = result.results.reduce((a,b) => a+b);
-
-	return result;
-}
 
 module.exports = {
 	data: {
@@ -80,14 +24,16 @@ module.exports = {
 		const keywords = [this.data.name, ...this.data.aliases];
 		const input = removePrefixAndKeywordsFromMessage(prefix, keywords, message);
 
-		// Validation
-		let wasAnValidInput;
+		// Data
 		const titleAndParametersFromInput = input.replace(rollCommandRegex, "").trim();
 		const diceNotationFromInput = input.replace(titleAndParametersFromInput, "").trim();
-		const inputForValidation = diceNotationFromInput.replaceAll(diceDetector, "1").replace(repetitionNotation, "");
+
+		// Validation
+		let wasAnValidInput;
+		const valid = diceNotationFromInput.replaceAll(diceDetector, "1").replace(repetitionNotation, "");
 		try {
-			if (!inputForValidation) throw new Error("La notación de dados enviada como input no coincide con la regex definida.");
-			evaluate(inputForValidation);
+			if (!valid) throw new Error();
+			evaluate(valid);
 			wasAnValidInput = true;
 		} catch (error) {
 			console.error(error);
@@ -97,48 +43,157 @@ module.exports = {
 
 		// Execution
 		if (wasAnValidInput) {
-			await message.reply("Ta bien 👍.");
+			let repetitions = 1;
+			const hasRepetitions = diceNotationFromInput.match(repetitionNotation);
+			if (hasRepetitions) repetitions = Number(hasRepetitions[1]);
 
-			const repetitions = diceNotationFromInput.match(repetitionNotation) ? Number(diceNotationFromInput.match(repetitionNotation)[1]) : 1;
 			if (repetitions < 1) await message.reply("ª");
 			else {
-				const diceRolledResults = [];
+				try {
+					const diceRolledResults = [];
 
-				// Tiradas de dados
-				for(let i=0; i<repetitions; i++) {
-					const currentIteration = [];
+					// Tiradas de dados
 					const diceRolled = diceNotationFromInput.match(diceDetector);
-					diceRolled.forEach(dice => {
-						diceParts = dice.match(diceDestructurator);
-						const quantity = diceParts[1];
-						const faces = diceParts[2];
-						const keepdropingType = diceParts[4];
-						const keepdropingAmount = diceParts[5];
+					for (let i=0; i<repetitions; i++) {
+						const currentIteration = [];
+						diceRolled.forEach(dice => {
+							diceParts = dice.match(diceDestructurator);
+							const quantity = diceParts[1] === "" ? 1 : Number(diceParts[1]);
+							const faces = diceParts[2].toLowerCase() === "f" ? "f" : Number(diceParts[2]);
+							const keepdropingType = diceParts[4];
+							const keepdropingAmount = Number(diceParts[5]);
 
-						const result = rollDice(dice, quantity, faces, keepdropingType, keepdropingAmount);
-						currentIteration.push(result);
+							const result = rollDice(dice, quantity, faces, keepdropingType, keepdropingAmount);
+							currentIteration.push(result);
+						});
+						diceRolledResults.push(currentIteration);
+					}
+
+					// Sustitución de los Resultados en el Input Inicial
+					const resultsToBeEvaluated = [];
+					diceRolledResults.forEach(repetitions => {
+						let diceNotationForEvaluation = `${diceNotationFromInput.replace(repetitionNotation, "")}`;
+						repetitions.forEach(result => {
+							const dice = result.diceRolled;
+							const value = result.total;
+							diceNotationForEvaluation = diceNotationForEvaluation.replace(dice, value);
+						});
+						resultsToBeEvaluated.push(diceNotationForEvaluation);
 					});
-					diceRolledResults.push(currentIteration);
+
+					// Aplicación de los Modificadores y Cálculo Final del Resultado
+					const finalResults = [];
+					resultsToBeEvaluated.forEach(result => { finalResults.push(evaluate(result)) });
+
+					// Mensaje de Respuesta
+					let embed;
+					const responseMessage = formatDiceResults(diceNotationFromInput, diceRolledResults, finalResults);
+					if (responseMessage.length > 1) {
+						embed = new EmbedBuilder({
+							author: { name: `${titleAndParametersFromInput || "Resultados"}:` },
+							fields: [...responseMessage, {name:"", value:`Total: ${finalResults.reduce((x, y) => x+y)}`}],
+							footer: { text: `Tirada hecha por @${message.author.username}`, icon_url: message.author.displayAvatarURL() }
+						});
+					} else {
+						embed = new EmbedBuilder({
+							author: { name: `${titleAndParametersFromInput || "Resultado"}:` },
+							fields: [{ name: "", value: responseMessage[0].value }],
+							footer: { text: `Tirada hecha por @${message.author.username}`, icon_url: message.author.displayAvatarURL() }
+						});
+					}
+
+					// Función para dejar un espacio entre cada símbolo (+ - * / ^)
+					function fixTextNotation(text) {
+						const symbols = ["+","-","*","/","^"];
+						const textWithoutSpaces = text.replaceAll(" ", "");
+
+						let finalText = textWithoutSpaces;
+						symbols.forEach(sym => {
+							finalText = finalText.replaceAll(sym, ` ${sym} `);
+						});
+
+						return finalText;
+					}
+
+					// Función para dar un formato bonito a los resultso antes de enviarlos en el embed.
+					function formatDiceResults(originalInput, diceRolled, results) {
+						const originalInputFixed = fixTextNotation(originalInput);
+						const messageWithFormat = [];
+						diceRolled.forEach((roll, index) => {
+							messageWithFormat.push(`${originalInputFixed.replace(repetitionNotation, "")}`);
+							roll.forEach(dice => {
+								const name = dice.diceRolled;
+								const value = Number(dice.total);
+
+								const diceParts = name.match(diceDestructurator);
+								const quantity = diceParts[1] === "" ? 1 : Number(diceParts[1]);
+								const faces = diceParts[2].toLowerCase() === "f" ? "f" : Number(diceParts[2]);
+								const keepdropingType = diceParts[4];
+
+								let diceWithFormat;
+
+								if (quantity === 1) {
+									if (faces === "f") {
+										if (value === -1) diceWithFormat = `[-] ${name}`;
+										if (value === 0) diceWithFormat = `[0] ${name}`;
+										if (value === 1) diceWithFormat = `[+] ${name}`;
+									} else {
+										const critical = (value === faces) || (value === 1);
+										if (critical) diceWithFormat = `[**__${value}__**] ${name}`;
+										else diceWithFormat = `[${value}] ${name}`;
+									}
+								}
+
+								if (quantity > 1) {
+									diceWithFormat = JSON.stringify(dice.results).replaceAll(",", ", ");
+									dice.results.forEach(result => {
+										if (faces === "f") {
+											diceWithFormat = diceWithFormat.replaceAll(new RegExp(`(?<!-)1`, "g"), "+");
+											diceWithFormat = diceWithFormat.replaceAll("-1", "-");
+										} else {
+											if (result === 1 || result === faces)
+												diceWithFormat = diceWithFormat.replace(new RegExp(`(?<!\\*\\*__)${result}(?!__\\*\\*)`), `**__${result}__**`);
+										}
+									});
+
+									if (keepdropingType) {
+										const keys = Object.keys(dice);
+										const remainingResults = [...dice.results];
+										dice[keys[2]].forEach(result => {
+											const valueIndex = remainingResults.findIndex(x => x === result);
+											remainingResults.splice(valueIndex, 1);
+										});
+										if (faces === "f") {
+											remainingResults.forEach(result => {
+												if (result === 1) diceWithFormat = diceWithFormat.replace("+", "̷+̷");
+												if (result === -1) diceWithFormat = diceWithFormat.replace(new RegExp(`(?<!\u0337)-(?!\u0337)`), "\u0337-\u0337");
+												if (result === 0) diceWithFormat = diceWithFormat.replace(new RegExp(`(?<!~~)${result}(?!~~)`), `~~${result}~~`);
+											});
+										} else {
+											remainingResults.forEach(result => {
+												diceWithFormat = diceWithFormat.replace(new RegExp(`(?<!~~)${result}(?!~~)`), `~~${result}~~`);
+											});
+										}
+
+									}
+
+									diceWithFormat = `${diceWithFormat} ${name}`;
+								}
+
+								messageWithFormat[index] = messageWithFormat[index].replace(new RegExp(`(?<!(\\[\\d+\\] ))${name}`, "i"), diceWithFormat);
+							});
+							messageWithFormat[index] = `\` ${results[index]} \` ⟵ `.concat(messageWithFormat[index]);
+						});
+
+						return messageWithFormat.map(msg => { return {name: "", value: msg} });
+					}
+
+					// await message.channel.send(`Tirada Original: ${diceNotationFromInput}\n\`\`\`js\n${JSON.stringify(diceRolledResults)}\n\`\`\`\nResultados: ${finalResults}`);
+					await message.reply({ embeds: [embed] });
+				} catch (error) {
+					message.reply(`Errorcito de tipo: "${error.message}" 👉 👈. Sumimasen.`);
+					console.error(error);
 				}
-
-				// Sustitución de los Resultados en el Input Inicial
-				const resultsToBeEvaluated = [];
-				diceRolledResults.forEach(repetitions => {
-					let diceNotationForEvaluation = `${diceNotationFromInput.replace(repetitionNotation, "")}`;
-					repetitions.forEach(result => {
-						const dice = result.diceRolled;
-						const value = result.total;
-						diceNotationForEvaluation = diceNotationForEvaluation.replace(dice, value);
-					});
-					resultsToBeEvaluated.push(diceNotationForEvaluation);
-				});
-
-				// Aplicación de los Modificadores y Cálculo Final del Resultado
-				const finalResults = [];
-				resultsToBeEvaluated.forEach(mathExpression => { finalResults.push(evaluate(mathExpression)) });
-
-				// Resultado Final
-				await message.channel.send(`Tirada Original: ${diceNotationFromInput}\n\`\`\`js\n${JSON.stringify(diceRolledResults)}\n\`\`\`\nResultados: ${finalResults}`);
 			}
 		}
 	}
