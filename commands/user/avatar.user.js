@@ -5,7 +5,7 @@ module.exports = {
 		.setName("Mostrar Avatar")
 		.setType(ApplicationCommandType.User),
 
-	async execute(interaction, client) {
+	async execute(interaction) {
 		user = interaction.targetUser;
 		const embed = {
 			description: `Avatar de ${user.displayName}`,

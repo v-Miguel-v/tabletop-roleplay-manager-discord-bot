@@ -5,6 +5,7 @@ const { identifyTextCommand, getTextCommandPrefix } = require("./utils/textComma
 
 require("dotenv").config();
 const TOKEN = process.env.TOKEN;
+const GUILD_ID = process.env.GUILD_ID;
 const CLIENT_ID = process.env.CLIENT_ID;
 const INTENTS = Number(process.env.INTENTS);
 
@@ -13,7 +14,7 @@ const client = new Client({ intents: INTENTS });
 const rest = new REST({ version: "10" }).setToken(TOKEN);
 
 // Command upload and client initialization...
-upload.applicationCommands(rest, CLIENT_ID);
+upload.applicationCommands(rest, CLIENT_ID, GUILD_ID);
 const existingTextCommands = upload.textCommands();
 client.on(Events.ClientReady, () => { console.log("El cliente está listo para su ejecución.\n"); });
 
@@ -23,23 +24,23 @@ async function detectTextCommand(message) {
 	if (message.author.bot) return;
 	const commandTextPrefix = getTextCommandPrefix(message.guild?.id);
 	const command = identifyTextCommand(message, commandTextPrefix, existingTextCommands);
-	handleInteraction.textCommand(command, message, client);
+	handleInteraction.textCommand(command, message);
 }
 
 // Interaction Detector
 client.on(Events.InteractionCreate, detectInteraction);
 async function detectInteraction(interaction) {
 	if (interaction.isChatInputCommand()) {
-		handleInteraction.slashCommand(interaction, client);
+		handleInteraction.slashCommand(interaction);
 	}
 	if (interaction.isUserContextMenuCommand()) {
-		handleInteraction.userCommand(interaction, client);
+		handleInteraction.userCommand(interaction);
 	}
 	if (interaction.isMessageContextMenuCommand()) {
-		handleInteraction.messageCommand(interaction, client);
+		handleInteraction.messageCommand(interaction);
 	}
 	if (interaction.isAutocomplete()) {
-		handleInteraction.autocomplete(interaction, client);
+		handleInteraction.autocomplete(interaction);
 	}
 }
 

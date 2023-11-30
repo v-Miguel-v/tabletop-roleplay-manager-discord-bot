@@ -9,7 +9,8 @@ module.exports = {
 		regexesWithPrefix: []
 	},
 
-	async execute(message, client) {
+	async execute(message) {
+		const client = message.client;
 		const regularPing = `${client.ws.ping}ms`;
 		let fullSentResponsePing = "Calculando...";
 		const response = await message.reply({

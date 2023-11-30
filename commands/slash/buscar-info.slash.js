@@ -41,7 +41,7 @@ module.exports = {
 			.setAutocomplete(true)
 		),
 
-	async autocomplete(interaction, client) {
+	async autocomplete(interaction) {
 		const trpgSelected = interaction.options.getString("juego-de-rol").replace(/ /g, "_");
 		const input = interaction.options.getFocused().toLowerCase();
 		let choices = searchIndexes[`${trpgSelected}_index`];
@@ -67,7 +67,7 @@ module.exports = {
 		await interaction.respond( filtered.map(choice => ({ name: choice, value: choice })) );
 	},
 
-	async execute(interaction, client) {
+	async execute(interaction) {
 		interaction.reply("Chambeando 😌✨");
 	}
 }

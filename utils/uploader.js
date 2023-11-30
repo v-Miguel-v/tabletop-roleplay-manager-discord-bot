@@ -32,13 +32,13 @@ module.exports = {
 		return textCommands;
 	},
 
-	async applicationCommands(rest, CLIENT_ID) {
+	async applicationCommands(rest, CLIENT_ID, GUILD_ID) {
 		try {
 			// Upload user, slash and message commands.
 			const userCommands = uploadCommands("user");
 			const slashCommands = uploadCommands("slash");
 			const messageCommands = uploadCommands("message");
-			await rest.put(Routes.applicationCommands(CLIENT_ID), {
+			await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), {
 				body: [...userCommands, ...slashCommands, ...messageCommands]
 			});
 

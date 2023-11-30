@@ -12,7 +12,7 @@ module.exports = {
 			.setRequired(false)
 		),
 
-	async execute(interaction, client) {
+	async execute(interaction) {
 		if (!interaction.guild) {
 			interaction.reply({ embeds: [new EmbedBuilder({ description: `_No es posible cambiar el prefijo de los comandos de texto fuera de los servidores._` })] });
 		} else {

@@ -12,7 +12,7 @@ module.exports = {
 		regexesWithPrefix: [errorFilterRegex]
 	},
 
-	async execute(message, client) {
+	async execute(message) {
 		// Get input (mathematical operation)
 		const prefix = getTextCommandPrefix(message.guild?.id);
 		const keywords = [this.data.name, ...this.data.aliases];

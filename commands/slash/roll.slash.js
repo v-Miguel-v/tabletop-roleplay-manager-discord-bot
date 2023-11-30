@@ -1,8 +1,6 @@
-const { EmbedBuilder } = require("discord.js");
-
 const evaluate = require("./../../instantiated_modules/mathjs");
-const { rollDice, isAnValidDice } = require("./roll/tools");
-const { getTextCommandPrefix, removePrefixAndKeywordsFromMessage } = require("./../../utils/textCommandTools");
+const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
+const { rollDice, isAnValidDice } = require("./../text/roll/tools");
 
 const repetitionNotation = /^(\d+)#/i;
 const diceDetector = /(\d*)d(\d+|f)((kh|kl|dh|dl|k|d)(\d*))?/ig;
@@ -10,21 +8,18 @@ const diceDestructurator = /(\d*)d(\d+|f)((kh|kl|dh|dl|k|d)(\d*))?/i;
 const rollCommandRegex = /^(\d+#)?(-?([\d\(\)]+\s*[\-+*\/]\s*)*)((\d*)d(\d+|f))((k|kh|kl|d|dh|dl)(\d*))?((\s*[\-+*\/]\s*[\d\(\)]+)*)((\s*[\-+*\/]\s*\d*d(\d+|f)((k|kh|kl|d|dh|dl)\d*)?(\s*[\-+*\/]\s*[\d\(\)]+)*)*)(?=[\s\n]|$)/i;
 
 module.exports = {
-	data: {
-		name: "roll",
-		description: "Genera un resultado aleatorio a partir de los dados lanzados.",
-		aliases: ["r", "lanza", "tira", "lanzar", "tirar"],
-		regexes: [rollCommandRegex],
-		regexesWithPrefix: [rollCommandRegex]
-	},
+	data: new SlashCommandBuilder()
+		.setName("roll")
+		.setDescription("Genera un resultado aleatorio a partir de los dados lanzados.")
+		.addStringOption(option => option
+			.setName("tirada")
+			.setDescription("Dados a lanzar")
+			.setRequired(true)
+		),
 
-	async execute(message) {
-		// Get input (dice roll parameters)
-		const prefix = getTextCommandPrefix(message.guild?.id);
-		const keywords = [this.data.name, ...this.data.aliases];
-		const input = removePrefixAndKeywordsFromMessage(prefix, keywords, message);
-
+	async execute(interaction) {
 		// Data
+		const input = interaction.options.getString("tirada");
 		const titleAndParametersFromInput = input.replace(rollCommandRegex, "").trim();
 		const diceNotationFromInput = input.replace(titleAndParametersFromInput, "").trim();
 
@@ -38,7 +33,7 @@ module.exports = {
 		} catch (error) {
 			console.error(error);
 			wasAnValidInput = false;
-			await message.reply("Ta mal 😔.");
+			await interaction.reply("Ta mal 😔.");
 		}
 
 		// Execution
@@ -47,7 +42,7 @@ module.exports = {
 			const hasRepetitions = diceNotationFromInput.match(repetitionNotation);
 			if (hasRepetitions) repetitions = Number(hasRepetitions[1]);
 
-			if (repetitions < 1) await message.reply("ª");
+			if (repetitions < 1) await interaction.reply("ª");
 			else {
 				try {
 					const diceRolledResults = [];
@@ -92,13 +87,13 @@ module.exports = {
 						embed = new EmbedBuilder({
 							author: { name: `${titleAndParametersFromInput || "Resultados"}:` },
 							fields: [...responseMessage, {name:"", value:`Total: ${finalResults.reduce((x, y) => x+y)}`}],
-							footer: { text: `Tirada hecha por @${message.author.username}`, icon_url: message.author.displayAvatarURL() }
+							footer: { text: `Tirada hecha por @${interaction.user.username}`, icon_url: interaction.user.displayAvatarURL() }
 						});
 					} else {
 						embed = new EmbedBuilder({
 							author: { name: `${titleAndParametersFromInput || "Resultado"}:` },
 							fields: [{ name: "", value: responseMessage[0].value }],
-							footer: { text: `Tirada hecha por @${message.author.username}`, icon_url: message.author.displayAvatarURL() }
+							footer: { text: `Tirada hecha por @${interaction.user.username}`, icon_url: interaction.user.displayAvatarURL() }
 						});
 					}
 
@@ -188,10 +183,10 @@ module.exports = {
 						return messageWithFormat.map(msg => { return {name: "", value: msg} });
 					}
 
-					// await message.channel.send(`Tirada Original: ${diceNotationFromInput}\n\`\`\`js\n${JSON.stringify(diceRolledResults)}\n\`\`\`\nResultados: ${finalResults}`);
-					await message.reply({ embeds: [embed] });
+					// await interaction.channel.send(`Tirada Original: ${diceNotationFromInput}\n\`\`\`js\n${JSON.stringify(diceRolledResults)}\n\`\`\`\nResultados: ${finalResults}`);
+					await interaction.reply({ embeds: [embed] });
 				} catch (error) {
-					message.reply(`Errorcito de tipo: "${error.message}" 👉 👈. Sumimasen.`);
+					interaction.reply(`Errorcito de tipo: "${error.interaction}" 👉 👈. Sumimasen.`);
 					console.error(error);
 				}
 			}

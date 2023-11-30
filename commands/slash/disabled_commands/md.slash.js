@@ -10,7 +10,8 @@ module.exports = {
 		.setName("md")
 		.setDescription("Te envía un mensaje privado."),
 
-	async execute(interaction, client) {
+	async execute(interaction) {
+		const client = interaction.client;
 		let nombre, raza, clase;
 		const user = interaction.user;
 		interaction.reply(`_Se envió un mensaje privado a ${user}._`);

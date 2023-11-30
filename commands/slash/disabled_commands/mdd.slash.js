@@ -9,7 +9,8 @@ module.exports = {
 		.setName("mdd")
 		.setDescription("Envía un mensaje privado (versión modulada)."),
 
-	async execute(interaction, client) {
+	async execute(interaction) {
+		const client = interaction.client;
 		const user = interaction.user;
 		await interaction.reply(`_Se envió un mensaje privado a ${user}._`);
 
